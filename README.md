@@ -47,3 +47,10 @@ app.listen(port, () => {
 console.log(\`Server is running on http://localhost:\${port}\`);
 });
 ```
+
+## Update tsconfig.json
+
+```
+sed -i '' 's/"target": "es2016"/"target": "es6"/g' tsconfig.json
+sed -i '' 's/"module": "commonjs"/"module": "commonjs",\n "outDir": ".\/dist",\n "rootDir": ".\/src"/g' tsconfig.json
+```
