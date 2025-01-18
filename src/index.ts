@@ -9,6 +9,7 @@ app.get('/', (req: Request, res: Response) => {
 
 // CRUDL: Create, Read, Update, Delete, List
 //        POST, GET, PUT/PATCH, DELETE, GET
+// TODO: Implement CRUDL for categories
 
 app.listen(port, () => {
     console.log(`Server is running on http://localhost:${port}`);

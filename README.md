@@ -3,6 +3,7 @@
 ## Initialize a new Node.js project
 
 ```
+nvm use v20.18.0
 npm init -y
 ```
 
