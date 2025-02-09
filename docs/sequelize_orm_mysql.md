@@ -9,7 +9,8 @@ npm i dotenv sequelize zod mysql2 uuid
 
 ```typescript
 // dotenv
-// zod: validation
+// zod: validation package
+// // prompt: type Category => validate zod
 ```
 
 ## Sample env file

@@ -1,6 +1,7 @@
 import { config } from 'dotenv';
 import express, { Request, Response } from 'express';
-import crypto from 'crypto';
+import { z } from 'zod';
+import { v7 } from 'uuid';
 
 config();
 
@@ -18,16 +19,18 @@ app.get('/', (req: Request, res: Response) => {
 app.use(express.json()); // for parsing application/json from request body
 
 app.post('/v1/categories', (req: Request, res: Response) => {
-    const { name, image, description, parentId } = req.body as CategoryCreateDTO;
+    const { success, data, error } = CategoryCreateSchema.safeParse(req.body);
 
-    if (name === '') {
+    if (!success) {
         res.status(400).json({
-            message: 'Name is required',
+            message: error.message,
         });
         return;
     }
 
-    const newId = crypto.randomUUID();
+    const { name, image, description, parentId } = data;
+
+    const newId = v7();
     const category: Category = {
         id: newId,
         name,
@@ -44,6 +47,7 @@ app.post('/v1/categories', (req: Request, res: Response) => {
 
     res.status(201).json({
         data: newId,
+        // data: data,
     });
 });
 
@@ -144,12 +148,14 @@ enum CategoryStatus {
 }
 
 // DTO: Data Transfer Object
-type CategoryCreateDTO = {
-    name: string;
-    image?: string;
-    description?: string;
-    parentId?: string | null;
-}
+const CategoryCreateSchema = z.object({
+    name: z.string().min(3, 'name must be at least 3 characters'),
+    image: z.string().optional(),
+    description: z.string().optional(),
+    parentId: z.string().uuid().nullable().optional(),
+});
+
+type CategoryCreateDTO = z.infer<typeof CategoryCreateSchema>;
 
 // Other create data dto
 type AnotherCategoryCreateDTO = Omit<Category, 'id' | 'position' | 'createdAt' | 'updatedAt'>;
@@ -166,17 +172,19 @@ type CategoryUpdateDTO = {
 type AnotherCategoryUpdateDTO = Pick<Category, 'name' | 'image' | 'description' | 'parentId' | 'status'>;
 
 // business model/entity/object
-type Category = {
-    id: string;
-    name: string;
-    image?: string;
-    description?: string;
-    position: number;
-    parentId: string | null;
-    status: CategoryStatus;
-    createdAt: Date;
-    updatedAt: Date;
-};
+const CategorySchema = z.object({
+    id: z.string().uuid(),
+    name: z.string().min(3, 'name is too short'),
+    image: z.string().optional(),
+    description: z.string().optional(),
+    position: z.number().min(0, 'invalid position').default(0),
+    parentId: z.string().uuid().nullable().optional(),
+    status: z.nativeEnum(CategoryStatus),
+    createdAt: z.date(),
+    updatedAt: z.date(),
+});
+
+type Category = z.infer<typeof CategorySchema>;
 
 let categories: Category[] = [
     {
