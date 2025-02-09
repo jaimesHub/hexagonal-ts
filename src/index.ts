@@ -1,7 +1,9 @@
 import { config } from 'dotenv';
 import express, { Request, Response } from 'express';
-import { z } from 'zod';
 import { v7 } from 'uuid';
+import { CategoryStatus } from './modules/category/model/model';
+import { CategoryCreateSchema, CategoryUpdateDTO } from './modules/category/model/dto';
+import { Category } from './modules/category/model/model';
 
 config();
 
@@ -141,50 +143,7 @@ app.listen(port, () => {
     console.log(`Server is running on http://localhost:${port}`);
 });
 
-enum CategoryStatus {
-    Active = 'active',
-    Inactive = 'inactive',
-    Deleted = 'deleted',
-}
 
-// DTO: Data Transfer Object
-const CategoryCreateSchema = z.object({
-    name: z.string().min(3, 'name must be at least 3 characters'),
-    image: z.string().optional(),
-    description: z.string().optional(),
-    parentId: z.string().uuid().nullable().optional(),
-});
-
-type CategoryCreateDTO = z.infer<typeof CategoryCreateSchema>;
-
-// Other create data dto
-type AnotherCategoryCreateDTO = Omit<Category, 'id' | 'position' | 'createdAt' | 'updatedAt'>;
-
-type CategoryUpdateDTO = {
-    name?: string;
-    image?: string;
-    description?: string;
-    parentId?: string | null;
-    status?: CategoryStatus;
-}
-
-// Other update data dto
-type AnotherCategoryUpdateDTO = Pick<Category, 'name' | 'image' | 'description' | 'parentId' | 'status'>;
-
-// business model/entity/object
-const CategorySchema = z.object({
-    id: z.string().uuid(),
-    name: z.string().min(3, 'name is too short'),
-    image: z.string().optional(),
-    description: z.string().optional(),
-    position: z.number().min(0, 'invalid position').default(0),
-    parentId: z.string().uuid().nullable().optional(),
-    status: z.nativeEnum(CategoryStatus),
-    createdAt: z.date(),
-    updatedAt: z.date(),
-});
-
-type Category = z.infer<typeof CategorySchema>;
 
 let categories: Category[] = [
     {

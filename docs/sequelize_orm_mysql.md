@@ -11,6 +11,8 @@ npm i dotenv sequelize zod mysql2 uuid
 // dotenv
 // zod: validation package
 // // prompt: type Category => validate zod
+
+// organizing code horizontally - model & dto
 ```
 
 ## Sample env file
