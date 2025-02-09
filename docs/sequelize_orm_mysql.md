@@ -13,6 +13,7 @@ npm i dotenv sequelize zod mysql2 uuid
 // // prompt: type Category => validate zod
 
 // organizing code horizontally - model & dto
+// organizing code horizontally - infras (controller/transport/infras)
 ```
 
 ## Sample env file
