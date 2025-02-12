@@ -1,24 +1,28 @@
 import { config } from 'dotenv';
 import express, { Request, Response } from 'express';
-import { v7 } from 'uuid';
-import { CategoryStatus } from './modules/category/model/model';
-import { CategoryCreateSchema, CategoryUpdateDTO } from './modules/category/model/dto';
-import { Category } from './modules/category/model/model';
 import { setupCategoryModule } from './modules/category';
+import { sequelize } from './share/component/sequelize';
 
 config();
 
-const app = express();
-const port = process.env.PORT || 3000;
+(async () => {
+    sequelize.authenticate();
+    console.log('Connection has been established successfully.');
 
-app.use(express.json()); // for parsing application/json from request body
+    const app = express();
+    const port = process.env.PORT || 3000;
 
-app.get('/', (req: Request, res: Response) => {
-    res.send('Hello, TypeScript Express!');
-});
+    app.use(express.json()); // for parsing application/json from request body
 
-app.use('/v1', setupCategoryModule());
+    app.get('/', (req: Request, res: Response) => {
+        res.send('Hello, TypeScript Express!');
+    });
 
-app.listen(port, () => {
-    console.log(`Server is running on http://localhost:${port}`);
-});
+    app.use('/v1', setupCategoryModule());
+
+    app.listen(port, () => {
+        console.log(`Server is running on http://localhost:${port}`);
+    });
+})();
+
+
