@@ -18,7 +18,7 @@ config();
         res.send('Hello, TypeScript Express!');
     });
 
-    app.use('/v1', setupCategoryModule());
+    app.use('/v1', setupCategoryModule(sequelize));
 
     app.listen(port, () => {
         console.log(`Server is running on http://localhost:${port}`);

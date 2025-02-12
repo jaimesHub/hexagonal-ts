@@ -1,47 +1,32 @@
 import { Request, Response } from "express";
+import { CategoryUpdateSchema } from "../model/dto";
+import { CategoryPersistence } from "./repository/dto";
+import { CategoryStatus } from "../model/model";
 
-export const updateCategoryApi = (req: Request, res: Response) => {
-    // const { id } = req.params;
+export const updateCategoryApi = () => async (req: Request, res: Response) => {
+    const { id } = req.params;
 
-    // const { name, image, description, parentId, status } = req.body as CategoryUpdateDTO;
+    const { success, data, error } = CategoryUpdateSchema.safeParse(req.body);
 
-    // const category = categories.find((category) => category.id === req.params.id);
+    if (!success) {
+        res.status(400).json({
+            message: error.message,
+        });
 
-    // if (!category) {
-    //     res.status(404).json({
-    //         message: 'Category not found',
-    //     });
-    //     return;
-    // }
+        return;
+    }
 
-    // if (name === '') {
-    //     res.status(400).json({
-    //         message: 'Name is required',
-    //     });
-    //     return;
-    // }
+    const categoryFound = await CategoryPersistence.findByPk(id);
 
-    // if (name) {
-    //     category.name = name;
-    // }
+    if (!categoryFound || categoryFound.status === CategoryStatus.Deleted) {
+        res.status(404).json({
+            message: "Category not found",
+        });
 
-    // if (image) {
-    //     category.image = image;
-    // }
+        return;
+    }
 
-    // if (description) {
-    //     category.description = description;
-    // }
-
-    // if (parentId) {
-    //     category.parentId = parentId;
-    // }
-
-    // if (status) {
-    //     category.status = status;
-    // }
-
-    // category.updatedAt = new Date();
+    await CategoryPersistence.update(data, { where: { id } });
 
     res.status(200).json({ data: true });
 }

@@ -19,6 +19,7 @@ npm i dotenv sequelize zod mysql2 uuid
 // // // - sample sequelize config, adding system params for mysql
 // // // - pool/connection pool (sequelize.ts): max, min, acquire, idle
 // // - other: prisma
+// organizing code horizontally - interacting w category table
 ```
 
 ## Sample env file
