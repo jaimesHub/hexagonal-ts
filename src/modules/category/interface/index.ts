@@ -25,7 +25,7 @@ export interface IQueryRepository {
 }
 
 export interface ICommandRepository {
-    insert(data: Category): Promise<void>;
+    insert(data: Category): Promise<boolean>;
     update(id: string, data: CategoryUpdateDTO): Promise<boolean>;
     delete(id: string): Promise<boolean>;
 

@@ -15,3 +15,5 @@
 - Port interfaces: ICategoryUseCase
 - UseCase --impl--> Port Interfaces
 - Presenter --> render html
+- infras/repository/repo.ts
+- setup DI
