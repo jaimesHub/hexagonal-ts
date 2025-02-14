@@ -5,19 +5,16 @@ import { Category } from "../model/model";
 export interface ICategoryUseCase {
     // Port Interfaces
     create(data: CategoryCreateDTO): Promise<string>;
+    update(id: string, data: CategoryUpdateDTO): Promise<boolean>;
+    delete(id: string): Promise<boolean>;
+    getDetail(id: string): Promise<Category | null>;
+    getList(cond: CategoryCondDTO, paging: PagingDTO): Promise<Array<Category>>;
 
 }
 
-export interface IRepository extends IQueryRepository, ICommandRepository {
-    // insert(data: Category): Promise<void>;
-    // update(id: string, data: CategoryUpdateDTO): Promise<boolean>;
-    // delete(id: string): Promise<boolean>;
+export interface IRepository extends IQueryRepository, ICommandRepository { }
 
-    // get(id: string): Promise<Category>;
-    // list(cond: CategoryCondDTO, paging: PagingDTO): Promise<Array<Category>>;
-}
-
-// Interface Segreration Principle
+// Interface Segregation Principle
 
 export interface IQueryRepository {
     get(id: string): Promise<Category | null>;
@@ -27,6 +24,6 @@ export interface IQueryRepository {
 export interface ICommandRepository {
     insert(data: Category): Promise<boolean>;
     update(id: string, data: CategoryUpdateDTO): Promise<boolean>;
-    delete(id: string): Promise<boolean>;
+    delete(id: string, isHard: boolean): Promise<boolean>;
 
 }

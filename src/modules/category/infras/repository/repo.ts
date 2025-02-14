@@ -2,7 +2,9 @@ import { Sequelize } from "sequelize";
 import { PagingDTO } from "../../../../share/model/paging";
 import { IRepository } from "../../interface";
 import { CategoryCondDTO, CategoryUpdateDTO } from "../../model/dto";
-import { Category } from "../../model/model";
+import { Category, CategorySchema } from "../../model/model";
+import { ModelStatus } from "../../../../share/model/base-model";
+import { Op } from "sequelize";
 
 // implement ORM here (Sequelize)
 
@@ -12,12 +14,35 @@ export class MySqlCategoryRepository implements IRepository {
         private readonly modelName: string,
     ) { }
 
-    get(id: string): Promise<Category | null> {
-        throw new Error("Method not implemented.");
+    async get(id: string): Promise<Category | null> {
+        const data = await this.sequelize.models[this.modelName].findByPk(id);
+
+        if (!data) {
+            return null;
+        }
+
+        return data.get({ plain: true }) as Category;
+        // return CategorySchema.parse(data.get({ plain: true })) as Category;
     }
 
-    list(cond: CategoryCondDTO, paging: PagingDTO): Promise<Array<Category>> {
-        throw new Error("Method not implemented.");
+    async list(cond: CategoryCondDTO, paging: PagingDTO): Promise<Array<Category>> {
+        const { page, limit } = paging;
+
+        const condSQL = { ...cond, status: { [Op.ne]: ModelStatus.DELETED } };
+
+        const total = await this.sequelize.models[this.modelName].count({ where: condSQL });
+
+        paging.total = total;
+
+        const rows = await this.sequelize.models[this.modelName].findAll({
+            where: condSQL,
+            order: [['created_at', 'DESC']],
+            limit,
+            offset: (page - 1) * limit,
+        });
+
+        // return rows.map(row => CategorySchema.parse(row.get({ plain: true })) as Category); // long time response
+        return rows.map(row => row.get({ plain: true }));
     }
 
     async insert(data: Category): Promise<boolean> {
@@ -25,12 +50,18 @@ export class MySqlCategoryRepository implements IRepository {
         return true;
     }
 
-    update(id: string, data: CategoryUpdateDTO): Promise<boolean> {
-        throw new Error("Method not implemented.");
+    async update(id: string, data: CategoryUpdateDTO): Promise<boolean> {
+        await this.sequelize.models[this.modelName].update(data, { where: { id } });
+        return true;
     }
 
-    delete(id: string): Promise<boolean> {
-        throw new Error("Method not implemented.");
+    async delete(id: string, isHard: boolean = false): Promise<boolean> {
+        if (!isHard) {
+            await this.sequelize.models[this.modelName].update({ status: ModelStatus.DELETED }, { where: { id } });
+        } else {
+            await this.sequelize.models[this.modelName].destroy({ where: { id } });
+        }
+        return true;
     }
 
 }
